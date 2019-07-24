@@ -1,0 +1,35 @@
+.card {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: none !important;
+    display: inline-block;
+    background: transparent !important;
+
+}
+
+.card img {
+    width: 100%;
+    border: none !important;
+    background: transparent !important;
+}
+
+.card .back, .card .front {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.card .back {
+    display: none;
+}
+
+.card.opened .front {
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.card.opened .back {
+    display: block;
+    transition: 0.2s;
+}
