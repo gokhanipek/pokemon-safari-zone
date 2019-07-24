@@ -7,7 +7,7 @@ User enters their name and enters the contest. If they can catch all the pokemon
 
 Created with ReactJS. Clone the project to your local. 
 
-### `git clone https://github.com/gokhanipek/safari-zone.git`
+### `git clone https://github.com/gokhanipek/pokemon-safari-zone.git`
 
 ### `npm install`
 
