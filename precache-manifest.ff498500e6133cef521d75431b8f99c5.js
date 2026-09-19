@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a45bd3c666e6778fd9d0e6872353ca0a",
+    "revision": "ba1549447b1e91328a86ed9fba632c6a",
     "url": "/pokemon-safari-zone/index.html"
   },
   {
@@ -8,16 +8,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/pokemon-safari-zone/static/css/2.22a7d4ef.chunk.css"
   },
   {
-    "revision": "3029c358524ac09374bc",
-    "url": "/pokemon-safari-zone/static/css/main.daf0989a.chunk.css"
+    "revision": "b6ad97d205f29c12a9e5",
+    "url": "/pokemon-safari-zone/static/css/main.603a347b.chunk.css"
   },
   {
     "revision": "b77db0c53cfcdd2576fc",
     "url": "/pokemon-safari-zone/static/js/2.4988ada2.chunk.js"
   },
   {
-    "revision": "3029c358524ac09374bc",
-    "url": "/pokemon-safari-zone/static/js/main.49f5e68e.chunk.js"
+    "revision": "b6ad97d205f29c12a9e5",
+    "url": "/pokemon-safari-zone/static/js/main.32894d2f.chunk.js"
   },
   {
     "revision": "4446eae4dc2ddf6c8348",
