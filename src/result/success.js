@@ -10,7 +10,7 @@ export default class Success extends React.Component {
                     <h3>Congragulations {this.props.location.userName}!</h3>
                     <h3>Your score: { this.props.location.pokeballs }</h3>
                     <p>By completing the competition succesfully, you have been awarded with this rare and shiny Pikachu Card</p>
-                    <img className="img-fluid img-thumbnail w-100" alt="prize" src={`${process.env.PUBLIC_URL}/img/prize.jpg`}/>
+                    <img className="img-fluid img-thumbnail d-block mx-auto" style={{ maxWidth: '300px' }} alt="prize" src={`${process.env.PUBLIC_URL}/img/prize.jpg`}/>
                     <Link to={'/'}> <p className="btn btn-danger m-2 text-white">Start Over</p> </Link>
 
                 </div>

@@ -20,7 +20,7 @@ import './App.css'
 
 
 ReactDOM.render((  
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
     <div className="navbar navbar-light">
       <Link to={'/'}> 
       <img className="mx-auto d-block pokemon-logo" src={`${process.env.PUBLIC_URL}/img/pokemon-logo.png`} alt="Logo" />
