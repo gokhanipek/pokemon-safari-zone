@@ -25,10 +25,10 @@ export default class Pokemon extends React.Component {
                      this.props.pokemon
                 )}>
           <div className="front">
-            <img className="img-thumbnail" alt="front" src={`/img/pokeball.png`}/>
+            <img className="img-thumbnail" alt="front" src={`${process.env.PUBLIC_URL}/img/pokeball.png`}/>
           </div>
           <div className="back">
-            <img alt="back" src={`/img/${this.props.pokemon}.png`}/>
+            <img alt="back" src={`${process.env.PUBLIC_URL}/img/${this.props.pokemon}.png`}/>
           </div>
         </div>
       )

@@ -23,7 +23,7 @@ ReactDOM.render((
     <BrowserRouter>
     <div className="navbar navbar-light">
       <Link to={'/'}> 
-      <img className="mx-auto d-block pokemon-logo" src={'./img/pokemon-logo.png'} alt="Logo" />
+      <img className="mx-auto d-block pokemon-logo" src={`${process.env.PUBLIC_URL}/img/pokemon-logo.png`} alt="Logo" />
       </Link>
     </div>
     <Provider store={store}>

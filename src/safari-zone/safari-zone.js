@@ -26,6 +26,14 @@ class SafariZone extends React.Component {
         this.start()
       }
 
+      componentDidMount(){
+        document.body.style.backgroundImage = `url('${process.env.PUBLIC_URL}/img/grass.png')`;
+      }
+
+      componentWillUnmount(){
+        document.body.style.backgroundImage = '';
+      }
+
       handleClick(name,index){
         if(this.state.encounteredPokemons.length === 2){
           setTimeout(() => {

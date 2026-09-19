@@ -46,7 +46,7 @@ class Home extends React.Component {
 
 
 const mapStateToProps = (state) => {
-  return state.userName
+  return { userName: state.safariZoneReducer.userName }
 }
 
 const mapDispatchToProps = (dispatch) => ({
