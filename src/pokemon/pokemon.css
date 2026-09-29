@@ -33,3 +33,17 @@
     display: block;
     transition: 0.2s;
 }
+
+/* Claimed cards: dimmed and outlined per side */
+.card.claimed {
+    opacity: 0.55;
+    border-radius: 8px !important;
+}
+
+.card.claimed-player {
+    box-shadow: 0 0 0 3px #2e7d32; /* green = player */
+}
+
+.card.claimed-opponent {
+    box-shadow: 0 0 0 3px #c62828; /* red = opponent */
+}

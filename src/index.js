@@ -6,8 +6,7 @@ import SafariZone from './safari-zone/safari-zone'
 import Home from './home/home'
 
 import { BrowserRouter, Route, Link } from 'react-router-dom';
-import Success from './result/success';
-import Failure from './result/failure';
+import Result from './result/result';
 import { Provider } from 'react-redux'
 import { store } from './state/store/store'
 
@@ -29,8 +28,7 @@ ReactDOM.render((
     <Provider store={store}>
       <Route exact path="/" component={Home} />
       <Route path="/SafariZone" component={SafariZone} />
-      <Route path="/success" component={Success} />
-      <Route path="/failure" component={Failure} />
+      <Route path="/result" component={Result} />
     </Provider>
     </BrowserRouter>
 ), document.getElementById('root'));
