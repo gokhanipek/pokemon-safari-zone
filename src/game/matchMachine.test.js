@@ -4,6 +4,10 @@ import {
   flip,
   resolve,
   matchOutcome,
+  expireTurn,
+  reshuffle,
+  queueTurnEffect,
+  DEFAULT_REVEAL_MS,
 } from './matchMachine';
 
 // Build a deterministic state by hand so we control card positions.
@@ -14,7 +18,12 @@ function stateFromGrid(grid, overrides = {}) {
     phase: 'awaitingFirst',
     flippedThisTurn: [],
     claimedPairs: { player: 0, opponent: 0 },
+    claimedNames: { player: [], opponent: [] },
     lastOutcome: null,
+    defaultRevealMs: DEFAULT_REVEAL_MS,
+    revealMs: DEFAULT_REVEAL_MS,
+    turnLimitMs: null,
+    pendingTurnEffect: null,
     ...overrides,
   };
 }
@@ -126,5 +135,105 @@ describe('match ends when grid cleared', () => {
     expect(s.phase).toBe('ended');
     expect(s.claimedPairs).toEqual({ player: 2, opponent: 1 });
     expect(matchOutcome(s)).toBe('player');
+  });
+});
+
+describe('claimed-name accounting (2.4)', () => {
+  it('records the claimed Pokemon name for the claiming side', () => {
+    const grid = [
+      pos(0, 'pikachu'),
+      pos(1, 'pikachu'),
+      pos(2, 'eevee'),
+      pos(3, 'eevee'),
+    ];
+    let s = stateFromGrid(grid);
+    s = flip(s, 0);
+    s = flip(s, 1);
+    s = resolve(s);
+    expect(s.claimedNames.player).toEqual(['pikachu']);
+    expect(s.claimedNames.opponent).toEqual([]);
+  });
+});
+
+describe('pendingTurnEffect / beginTurn (2.1)', () => {
+  // memory-duel: "Blind Spot shortens the reveal on the affected turn"
+  it('a queued reveal effect sets the next turn revealMs and is then cleared', () => {
+    // player misses -> opponent turn begins; queue a 300ms reveal for that turn
+    const grid = [pos(0, 'pikachu'), pos(1, 'eevee'), pos(2, 'pikachu'), pos(3, 'eevee')];
+    let s = stateFromGrid(grid);
+    s = queueTurnEffect(s, { revealMs: 300 });
+    expect(s.pendingTurnEffect).toEqual({ revealMs: 300 });
+
+    s = flip(s, 0);
+    s = flip(s, 1);
+    s = resolve(s); // miss -> begins opponent turn, consuming the pending effect
+    expect(s.activePlayer).toBe('opponent');
+    expect(s.revealMs).toBe(300);
+    expect(s.pendingTurnEffect).toBeNull();
+  });
+
+  it('without a pending effect a new turn uses the default reveal', () => {
+    const grid = [pos(0, 'pikachu'), pos(1, 'eevee'), pos(2, 'pikachu'), pos(3, 'eevee')];
+    let s = stateFromGrid(grid);
+    s = flip(s, 0);
+    s = flip(s, 1);
+    s = resolve(s); // miss
+    expect(s.revealMs).toBe(DEFAULT_REVEAL_MS);
+  });
+});
+
+describe('expireTurn (2.3, Speed Round)', () => {
+  // memory-duel: "Turn ends early under Speed Round"
+  it('expiry after zero flips passes the turn and claims nothing', () => {
+    const grid = [pos(0, 'pikachu'), pos(1, 'pikachu')];
+    let s = stateFromGrid(grid);
+    s = expireTurn(s);
+    expect(s.lastOutcome).toBe('expired');
+    expect(s.activePlayer).toBe('opponent');
+    expect(s.claimedPairs).toEqual({ player: 0, opponent: 0 });
+    expect(s.phase).toBe('awaitingFirst');
+  });
+
+  // match-modifiers: "Opponent turn expires under Speed Round"
+  it('expiry after one flip leaves that card revealed and claims nothing', () => {
+    const grid = [pos(0, 'pikachu'), pos(1, 'eevee'), pos(2, 'pikachu')];
+    let s = stateFromGrid(grid, { activePlayer: 'opponent' });
+    s = flip(s, 0);
+    expect(s.grid.find((p) => p.cardId === 0).faceUp).toBe(true);
+    s = expireTurn(s);
+    // the flipped card remains revealed
+    expect(s.grid.find((p) => p.cardId === 0).faceUp).toBe(true);
+    expect(s.activePlayer).toBe('player'); // passed
+    expect(s.claimedPairs).toEqual({ player: 0, opponent: 0 });
+  });
+});
+
+describe('reshuffle (2.2, Chaos)', () => {
+  // memory-duel: "Mid-match reshuffle of unclaimed cards"
+  it('keeps claimed pairs/counts and only rearranges unclaimed positions', () => {
+    const grid = [
+      pos(0, 'pikachu', { claimedBy: 'player' }),
+      pos(1, 'pikachu', { claimedBy: 'player' }),
+      pos(2, 'eevee'),
+      pos(3, 'onix'),
+      pos(4, 'eevee'),
+      pos(5, 'onix'),
+    ];
+    let s = stateFromGrid(grid, { claimedPairs: { player: 1, opponent: 0 } });
+    s = reshuffle(s);
+    expect(s.claimedPairs).toEqual({ player: 1, opponent: 0 });
+    // claimed positions unchanged
+    expect(s.grid[0].claimedBy).toBe('player');
+    expect(s.grid[1].claimedBy).toBe('player');
+    // unclaimed names preserved as a multiset
+    const unclaimed = s.grid.filter((p) => p.claimedBy === null).map((p) => p.name).sort();
+    expect(unclaimed).toEqual(['eevee', 'eevee', 'onix', 'onix']);
+    expect(s.flippedThisTurn).toEqual([]);
+  });
+
+  it('is a no-op outside a turn boundary', () => {
+    const grid = [pos(0, 'eevee'), pos(1, 'onix')];
+    const s = stateFromGrid(grid, { phase: 'resolving' });
+    expect(reshuffle(s)).toBe(s);
   });
 });

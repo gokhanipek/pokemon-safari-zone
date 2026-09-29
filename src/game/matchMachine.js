@@ -8,12 +8,23 @@
 //   phase: 'awaitingFirst' | 'awaitingSecond' | 'resolving' | 'ended',
 //   flippedThisTurn: number[],            // cardIds flipped this turn (0-2)
 //   claimedPairs: { player: number, opponent: number },
-//   lastOutcome: 'match' | 'miss' | null, // result of the most recent resolve
+//   claimedNames: { player: string[], opponent: string[] }, // names claimed per side
+//   lastOutcome: 'match' | 'miss' | 'expired' | null,
+//   defaultRevealMs: number,              // baseline reveal duration
+//   revealMs: number,                     // reveal for the CURRENT turn
+//   turnLimitMs: number | null,           // Speed Round clock for the CURRENT turn
+//   pendingTurnEffect: null | {           // applies to the next turn that begins
+//     revealMs?: number,
+//     turnLimitMs?: number,
+//   },
 // }
 
 import { buildGrid, evaluateFlips, determineWinner, isGridCleared } from './match';
+import { reshuffleUnclaimed } from './modifiers';
 
 export const OTHER = { player: 'opponent', opponent: 'player' };
+
+export const DEFAULT_REVEAL_MS = 800;
 
 /**
  * Create the initial match state for two decks.
@@ -28,12 +39,49 @@ export function createMatch(playerDeck, opponentDeck, startingPlayer = 'player')
     phase: 'awaitingFirst',
     flippedThisTurn: [],
     claimedPairs: { player: 0, opponent: 0 },
+    claimedNames: { player: [], opponent: [] },
     lastOutcome: null,
+    defaultRevealMs: DEFAULT_REVEAL_MS,
+    revealMs: DEFAULT_REVEAL_MS,
+    turnLimitMs: null,
+    pendingTurnEffect: null,
   };
 }
 
 function positionById(grid, cardId) {
   return grid.find((p) => p.cardId === cardId);
+}
+
+/**
+ * Begin a new turn for `activePlayer`: consume any pendingTurnEffect into this
+ * turn's revealMs / turnLimitMs, otherwise fall back to defaults.
+ * Pure; returns new state with phase 'awaitingFirst' and an empty flip list.
+ */
+function beginTurn(state, activePlayer) {
+  const pending = state.pendingTurnEffect;
+  return {
+    ...state,
+    activePlayer,
+    phase: 'awaitingFirst',
+    flippedThisTurn: [],
+    revealMs:
+      pending && typeof pending.revealMs === 'number'
+        ? pending.revealMs
+        : state.defaultRevealMs,
+    turnLimitMs:
+      pending && typeof pending.turnLimitMs === 'number'
+        ? pending.turnLimitMs
+        : null,
+    pendingTurnEffect: null,
+  };
+}
+
+/**
+ * Queue an effect to apply to the opponent's next turn (Blind Spot / Speed Round).
+ * `effect` is { revealMs?, turnLimitMs? }. Applied when that turn begins.
+ */
+export function queueTurnEffect(state, effect) {
+  return { ...state, pendingTurnEffect: { ...effect } };
 }
 
 /**
@@ -94,31 +142,67 @@ export function resolve(state) {
       ...state.claimedPairs,
       [state.activePlayer]: state.claimedPairs[state.activePlayer] + 1,
     };
+    const claimedNames = {
+      ...state.claimedNames,
+      [state.activePlayer]: [...state.claimedNames[state.activePlayer], a.name],
+    };
     const cleared = isGridCleared(grid);
     return {
       ...state,
       grid,
       claimedPairs,
+      claimedNames,
       flippedThisTurn: [],
       phase: cleared ? 'ended' : 'awaitingFirst',
       lastOutcome: 'match',
-      // active player keeps the turn on a match
+      // active player keeps the turn on a match; reveal/limit unchanged this turn
     };
   }
 
-  // miss: flip both back down, pass turn
+  // miss: flip both back down, pass turn (begin the other player's turn)
   const grid = state.grid.map((p) =>
     p.cardId === firstId || p.cardId === secondId
       ? { ...p, faceUp: false }
       : p
   );
+  return beginTurn(
+    { ...state, grid, lastOutcome: 'miss' },
+    OTHER[state.activePlayer]
+  );
+}
+
+/**
+ * Speed Round timeout: end the current turn after 0 or 1 flips.
+ * Any card already flipped this turn REMAINS revealed (no flip-back), no pair
+ * is claimed, and the turn passes to the other player.
+ * Valid while awaiting flips (awaitingFirst / awaitingSecond).
+ */
+export function expireTurn(state) {
+  if (state.phase !== 'awaitingFirst' && state.phase !== 'awaitingSecond') {
+    return state;
+  }
+  // Cards flipped this turn stay face-up (grid already reflects that).
+  return beginTurn(
+    { ...state, lastOutcome: 'expired' },
+    OTHER[state.activePlayer]
+  );
+}
+
+/**
+ * Chaos: reshuffle unclaimed positions immediately. Claimed cards stay put.
+ * The current turn's flip progress is reset (any this-turn flips are cleared,
+ * since reshuffleUnclaimed sets unclaimed cards face-down), keeping the active
+ * player but restarting their flip count. Only valid at a turn boundary
+ * (awaitingFirst) so it never strands a mid-resolve pair.
+ */
+export function reshuffle(state) {
+  if (state.phase !== 'awaitingFirst') {
+    return state;
+  }
   return {
     ...state,
-    grid,
+    grid: reshuffleUnclaimed(state.grid),
     flippedThisTurn: [],
-    activePlayer: OTHER[state.activePlayer],
-    phase: 'awaitingFirst',
-    lastOutcome: 'miss',
   };
 }
 

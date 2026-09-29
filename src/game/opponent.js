@@ -1,5 +1,7 @@
-// Opponent AI selection (Phase 1: basic).
+// Opponent AI selection (Phase 1: basic) + modifier trigger policy (Phase 2).
 // Pure selection helper - the component schedules these picks on timers.
+
+import { CHAOS } from './modifiers';
 
 /**
  * Positions the opponent may still flip: face-down, unclaimed, and not
@@ -69,11 +71,88 @@ export function chooseOpponentFlip(state, seen = {}) {
 }
 
 /**
+ * How many cards the opponent may hold in memory at once.
+ * capacity = difficulty level + modifier tier, where:
+ * - level is the difficulty rank (0 easy, 1 normal, 2 hard)
+ * - tier is the relevant modifier tier (the opponent's own modifier tier for
+ *   the opponent's memory); a missing/null modifier contributes 0.
+ * The result is never negative.
+ * @param {number} level
+ * @param {number} [tier]
+ * @returns {number}
+ */
+export function memoryCapacity(level, tier) {
+  const lvl = Number.isFinite(level) ? level : 0;
+  const t = Number.isFinite(tier) ? tier : 0;
+  const cap = lvl + t;
+  return cap > 0 ? cap : 0;
+}
+
+/**
  * Update the opponent's memory of seen cards after a flip is revealed.
+ *
+ * When `capacity` is a number, the memory is bounded to that many cards: the
+ * just-seen card is always kept, and if that pushes memory over capacity, other
+ * remembered cards are forgotten (chosen at random) down to the limit. A
+ * capacity of 0 means the opponent remembers nothing. Omitting `capacity`
+ * leaves the memory unbounded (prior behavior).
  * @param {Object<number,string>} seen
  * @param {{cardId:number,name:string}} position
+ * @param {number} [capacity]
  * @returns {Object<number,string>} new memory map
  */
-export function rememberCard(seen, position) {
-  return { ...seen, [position.cardId]: position.name };
+export function rememberCard(seen, position, capacity) {
+  const next = { ...seen, [position.cardId]: position.name };
+  if (typeof capacity !== 'number') {
+    return next;
+  }
+  if (capacity <= 0) {
+    return {};
+  }
+  const keys = Object.keys(next);
+  if (keys.length <= capacity) {
+    return next;
+  }
+  // Over capacity: forget random cards, but never the one just seen.
+  const justSeen = String(position.cardId);
+  const removable = keys.filter((k) => k !== justSeen);
+  let removeCount = keys.length - capacity;
+  while (removeCount > 0 && removable.length > 0) {
+    const idx = Math.floor(Math.random() * removable.length);
+    const [key] = removable.splice(idx, 1);
+    delete next[key];
+    removeCount -= 1;
+  }
+  return next;
+}
+
+/**
+ * Decide whether the opponent should trigger its held modifier this turn.
+ *
+ * Basic Phase 2 policy (once per match):
+ * - Only when the opponent holds an untriggered modifier and it is the
+ *   opponent's turn at a turn boundary (awaitingFirst, no flips yet).
+ * - Chaos: fire when the opponent is trailing (the player has claimed more
+ *   pairs), to disrupt the board.
+ * - Blind Spot / Speed Round (opponent-next-turn effects): fire so they land
+ *   on the player's upcoming turn.
+ *
+ * @param {object} state - match state ({activePlayer, phase, flippedThisTurn, claimedPairs})
+ * @param {{id:string,tier:number}|null} modifier - the opponent's held modifier
+ * @param {boolean} alreadyTriggered - whether the opponent already used it this match
+ * @returns {boolean} true if the opponent should trigger now
+ */
+export function chooseOpponentModifierTrigger(state, modifier, alreadyTriggered) {
+  if (!modifier || alreadyTriggered) return false;
+  if (state.activePlayer !== 'opponent') return false;
+  if (state.phase !== 'awaitingFirst') return false;
+  if (state.flippedThisTurn.length !== 0) return false;
+
+  if (modifier.id === CHAOS) {
+    // Disrupt when trailing.
+    return state.claimedPairs.player > state.claimedPairs.opponent;
+  }
+  // opponentNextTurn effects (Blind Spot / Speed Round): always worth firing
+  // to hamper the player's next turn.
+  return true;
 }

@@ -7,6 +7,8 @@ import Home from './home/home'
 
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import Result from './result/result';
+import Shop from './shop/shop';
+import Lobby from './lobby/lobby';
 import { Provider } from 'react-redux'
 import { store } from './state/store/store'
 
@@ -27,8 +29,10 @@ ReactDOM.render((
     </div>
     <Provider store={store}>
       <Route exact path="/" component={Home} />
+      <Route path="/lobby" component={Lobby} />
       <Route path="/SafariZone" component={SafariZone} />
       <Route path="/result" component={Result} />
+      <Route path="/shop" component={Shop} />
     </Provider>
     </BrowserRouter>
 ), document.getElementById('root'));
