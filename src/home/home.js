@@ -2,7 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 
 import { connect } from 'react-redux'
-import { registerUserAction } from './../state/actions/actions'
+import { registerUserAction, setDifficultyAction } from './../state/actions/actions'
+import { DIFFICULTY_OPTIONS } from './../game/difficulty'
 
 
 class Home extends React.Component {
@@ -31,11 +32,29 @@ class Home extends React.Component {
                         <h3 className="font-weight-bold">Welcome to Safari Zone!</h3>
                         <p className="text-justify">This is a special zone to catch unique Pokemons! There is no fighting here. You go inside, pet and feed the pokemons. And if they like you, you may even catch them!</p>
                         <p className="text-justify">Choose your level, catch them all, and you may win a prize!</p>
+
+                        <div className="my-3">
+                            <p className="font-weight-bold mb-1">Difficulty</p>
+                            {DIFFICULTY_OPTIONS.map((opt) => (
+                                <button
+                                    key={opt.level}
+                                    type="button"
+                                    className={`btn m-1 ${this.props.difficulty === opt.level ? 'btn-success' : 'btn-outline-success'}`}
+                                    onClick={() => this.props.setDifficulty(opt.level)}>
+                                    {opt.label}
+                                </button>
+                            ))}
+                            <p className="small text-muted mt-1">
+                                Higher difficulty sharpens the opponent's memory of revealed cards.
+                            </p>
+                        </div>
+
                         <input type="text" className="form-control" 
                             placeholder="What is your name?"
                             value={this.state.input} 
                             onChange={ this.onChange } />
-                        <Link to={'/SafariZone'}  onClick={this.onSubmit} value={this.state.input} className="btn btn-success m-2 text-white"> Enter </Link>
+                        <Link to={'/lobby'}  onClick={this.onSubmit} value={this.state.input} className="btn btn-success m-2 text-white"> Enter </Link>
+                        <Link to={'/vat'} className="btn btn-dark m-2 text-white"> Try the Vats prototype </Link>
                         <a href="https://github.com/gokhanipek/pokemon-safari-zone" target="_blank" rel="noopener noreferrer" className="btn btn-info m-2 text-white"> Code </a>
                     </div>
                 </div>
@@ -46,13 +65,19 @@ class Home extends React.Component {
 
 
 const mapStateToProps = (state) => {
-  return { userName: state.safariZoneReducer.userName }
+  return {
+    userName: state.safariZoneReducer.userName,
+    difficulty: state.safariZoneReducer.difficulty,
+  }
 }
 
 const mapDispatchToProps = (dispatch) => ({
   registerUser: (payload) => {
     dispatch(registerUserAction(payload))
   }, 
+  setDifficulty: (level) => {
+    dispatch(setDifficultyAction(level))
+  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

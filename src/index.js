@@ -6,8 +6,10 @@ import SafariZone from './safari-zone/safari-zone'
 import Home from './home/home'
 
 import { BrowserRouter, Route, Link } from 'react-router-dom';
-import Success from './result/success';
-import Failure from './result/failure';
+import Result from './result/result';
+import Shop from './shop/shop';
+import Lobby from './lobby/lobby';
+import VatGame from './vat/vat-game';
 import { Provider } from 'react-redux'
 import { store } from './state/store/store'
 
@@ -21,16 +23,21 @@ import './App.css'
 
 ReactDOM.render((  
     <BrowserRouter basename={process.env.PUBLIC_URL}>
-    <div className="navbar navbar-light">
-      <Link to={'/'}> 
-      <img className="mx-auto d-block pokemon-logo" src={`${process.env.PUBLIC_URL}/img/pokemon-logo.png`} alt="Logo" />
-      </Link>
-    </div>
+    {/* The Pokemon logo bar belongs to the old game, not the vat prototype. */}
+    <Route render={({ location }) => location.pathname.startsWith('/vat') ? null : (
+      <div className="navbar navbar-light">
+        <Link to={'/'}>
+        <img className="mx-auto d-block pokemon-logo" src={`${process.env.PUBLIC_URL}/img/pokemon-logo.png`} alt="Logo" />
+        </Link>
+      </div>
+    )} />
     <Provider store={store}>
       <Route exact path="/" component={Home} />
+      <Route path="/lobby" component={Lobby} />
       <Route path="/SafariZone" component={SafariZone} />
-      <Route path="/success" component={Success} />
-      <Route path="/failure" component={Failure} />
+      <Route path="/result" component={Result} />
+      <Route path="/shop" component={Shop} />
+      <Route path="/vat" component={VatGame} />
     </Provider>
     </BrowserRouter>
 ), document.getElementById('root'));
