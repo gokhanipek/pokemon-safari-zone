@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/pokemon-safari-zone/static/css/main.603a347b.chunk.css",
-    "main.js": "/pokemon-safari-zone/static/js/main.7494f111.chunk.js",
-    "main.js.map": "/pokemon-safari-zone/static/js/main.7494f111.chunk.js.map",
+    "main.css": "/pokemon-safari-zone/static/css/main.6cca4294.chunk.css",
+    "main.js": "/pokemon-safari-zone/static/js/main.a0ed0f12.chunk.js",
+    "main.js.map": "/pokemon-safari-zone/static/js/main.a0ed0f12.chunk.js.map",
     "runtime~main.js": "/pokemon-safari-zone/static/js/runtime~main.6ca0041c.js",
     "runtime~main.js.map": "/pokemon-safari-zone/static/js/runtime~main.6ca0041c.js.map",
     "static/css/2.22a7d4ef.chunk.css": "/pokemon-safari-zone/static/css/2.22a7d4ef.chunk.css",
-    "static/js/2.4988ada2.chunk.js": "/pokemon-safari-zone/static/js/2.4988ada2.chunk.js",
-    "static/js/2.4988ada2.chunk.js.map": "/pokemon-safari-zone/static/js/2.4988ada2.chunk.js.map",
+    "static/js/2.034ec36e.chunk.js": "/pokemon-safari-zone/static/js/2.034ec36e.chunk.js",
+    "static/js/2.034ec36e.chunk.js.map": "/pokemon-safari-zone/static/js/2.034ec36e.chunk.js.map",
     "index.html": "/pokemon-safari-zone/index.html",
-    "precache-manifest.52cec5b15d4bf9147fe3bf2d8a66965d.js": "/pokemon-safari-zone/precache-manifest.52cec5b15d4bf9147fe3bf2d8a66965d.js",
+    "precache-manifest.aea95149e4b7a81e5b4794eff8d4ba1d.js": "/pokemon-safari-zone/precache-manifest.aea95149e4b7a81e5b4794eff8d4ba1d.js",
     "service-worker.js": "/pokemon-safari-zone/service-worker.js",
     "static/css/2.22a7d4ef.chunk.css.map": "/pokemon-safari-zone/static/css/2.22a7d4ef.chunk.css.map",
-    "static/css/main.603a347b.chunk.css.map": "/pokemon-safari-zone/static/css/main.603a347b.chunk.css.map"
+    "static/css/main.6cca4294.chunk.css.map": "/pokemon-safari-zone/static/css/main.6cca4294.chunk.css.map"
   }
 }
