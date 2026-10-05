@@ -54,6 +54,7 @@ class Home extends React.Component {
                             value={this.state.input} 
                             onChange={ this.onChange } />
                         <Link to={'/lobby'}  onClick={this.onSubmit} value={this.state.input} className="btn btn-success m-2 text-white"> Enter </Link>
+                        <Link to={'/vat'} className="btn btn-dark m-2 text-white"> Try the Vats prototype </Link>
                         <a href="https://github.com/gokhanipek/pokemon-safari-zone" target="_blank" rel="noopener noreferrer" className="btn btn-info m-2 text-white"> Code </a>
                     </div>
                 </div>

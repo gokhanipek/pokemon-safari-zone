@@ -4,6 +4,7 @@ import { createStarterDeck, addPokemon, swapPokemon, isDeckFull, canAddPokemon }
 import { scoreClaimedNames, modifierPrice, cardPrice } from './../../game/economy'
 import { FIRST_DAY, advanceDay, isReleased } from './../../game/campaign'
 import { DEFAULT_DIFFICULTY, clampDifficulty } from './../../game/difficulty'
+import vatReducer from './vatReducer'
 
 const initialState = {
     userName: '',
@@ -149,5 +150,6 @@ export default function safariZoneReducer( state = initialState, action ){
     }
 }
 export const allReducers = combineReducers({
-    safariZoneReducer 
+    safariZoneReducer,
+    vatReducer
 })
