@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <title>Safari Zone</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7b267"/>
+      <stop offset="0.7" stop-color="#fbd38d"/>
+      <stop offset="1" stop-color="#fde7b5"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#sky)"/>
+  <circle cx="900" cy="430" r="150" fill="#f6893b" opacity="0.85"/>
+
+  <!-- far hills and grass -->
+  <path d="M0 470 Q320 410 640 460 T1280 450 V720 H0 Z" fill="#d9a441"/>
+  <path d="M0 540 Q400 500 760 545 T1280 530 V720 H0 Z" fill="#c38a2e"/>
+
+  <!-- acacia tree -->
+  <g fill="#3b2a1a">
+    <path d="M262 545 L272 400 L250 360 L262 356 L282 392 L300 350 L312 356 L290 402 L284 545 Z"/>
+    <ellipse cx="282" cy="350" rx="140" ry="26"/>
+    <ellipse cx="240" cy="338" rx="70" ry="18"/>
+    <ellipse cx="330" cy="336" rx="80" ry="18"/>
+  </g>
+  <!-- small tree far right -->
+  <g fill="#5a3f24" opacity="0.8">
+    <rect x="1118" y="420" width="6" height="60"/>
+    <ellipse cx="1121" cy="420" rx="48" ry="10"/>
+  </g>
+
+  <text x="640" y="660" text-anchor="middle" font-family="'Trebuchet MS', 'Segoe UI', sans-serif"
+        font-size="120" font-weight="700" fill="#fff8e7" stroke="#3b2a1a" stroke-width="8"
+        paint-order="stroke" letter-spacing="2">safari-zone</text>
+</svg>
